@@ -1,0 +1,56 @@
+#!/bin/bash
+
+#List of variables
+swarm="swarm"
+start="start"
+stop="stop"
+create="create"
+remove="remove"
+help="help"
+
+#Determining command fired
+if [ $1 = $swarm ] ; then								#Swarm command	
+	if [ $2 = $start ] ; then										#Swarm Start	
+		docker-machine start default 
+		eval "$(docker-machine env default)" 
+		docker ps -a
+		docker-machine start swarm-master 
+		docker-machine start node-01
+		docker-machine start node-02
+		eval "$(docker-machine env --swarm swarm-master)"
+		docker ps -a	
+	elif [ $2 = $stop ] ; then									#Swarm Stop
+		docker-machine stop node-02
+		docker-machine stop node-01
+		docker-machine stop swarm-master
+		docker-machine stop default	
+	elif [ $2 = $remove ] ; then									#Swarm Remove
+		docker-machine rm -y node-02
+		docker-machine rm -y node-01
+		docker-machine rm -y swarm-master
+		docker-machine rm -y default
+	elif [ $2 = $create ] ; then									#Swarm Create
+		docker-machine create -d virtualbox default
+		docker-machine env default
+		eval "$(docker-machine env default)"
+		docker run swarm create
+		docker-machine create -d virtualbox --swarm --swarm-master --swarm-discovery token://SWARM_CLUSTER_TOKEN master
+		docker-machine create -d virtualbox --swarm --swarm-discovery token://SWARM_CLUSTER_TOKEN node-01
+		#docker-machine create -d virtualbox --swarm --swarm-discovery token://SWARM_CLUSTER_TOKEN node-02
+		eval "$(docker-machine env --swarm swarm-master)"
+ 		docker info	
+ 	elif [ $2 = $help ] ; then									#Swarm Help
+ 		printf "docker-utils swarm [Option]\n
+[Option] :\n
+create: \t Create a standard Swarm cluster of 1 master and 2 nodes (3 hosts)\n
+start: \t\t Restart the Swarm cluster after restarting the host or stopping the cluster\n
+stop: \t\t Stop all hosts in the Swarm Cluster\n
+remove: \t Destroy the Swarm Cluster\n\n" 		 
+ 	else													#Wrong Second Argument
+ 		printf "\nInvalid Argument: \nEnter 'docker-utils swarm help' to get more information about Docker-Utils Swarm Commands
+Enter 'docker-utils help' to get information about other Docker-Utils commands.\n\n"	
+	fi		
+fi
+
+
+	
