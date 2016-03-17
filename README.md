@@ -8,4 +8,7 @@ Our core deployment platform is based on the use of Docker containers. We are us
 The GUI has been constructed using HTML, CSS-Bootstrap libraries and Javascript
 
 #Server-side
-The server-side scripts are in Python using Flask as a the server. We are also using bash scripts to control deployment of the applications on the institute server. 
+The server-side scripts are in Python using Flask as a the server.
+
+#Submarine
+It is a shell script written by us which acts as an interface between the server scripts and Cloud infrastructure and manges deployment of applications. 
